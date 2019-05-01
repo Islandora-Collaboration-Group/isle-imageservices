@@ -606,7 +606,7 @@ redaction.enabled = false
 #----------------------------------------
 
 # `trace`, `debug`, `info`, `warn`, `error`, `all`, or `off`
-log.application.level = error
+log.application.level = {{getv "/cantaloupe/log/application/level"}}
 
 log.application.ConsoleAppender.enabled = true
 
@@ -614,7 +614,7 @@ log.application.ConsoleAppender.enabled = true
 log.application.FileAppender.enabled = false
 log.application.FileAppender.pathname = /var/log/cantaloupe/cantaloupe.log
 
-log.application.RollingFileAppender.enabled = true
+log.application.RollingFileAppender.enabled = false
 log.application.RollingFileAppender.pathname = /var/log/cantaloupe/cantaloupe.log
 log.application.RollingFileAppender.policy = TimeBasedRollingPolicy
 log.application.RollingFileAppender.TimeBasedRollingPolicy.filename_pattern = /var/log/cantaloupe/cantaloupe-%d{yyyy-MM-dd}.log
@@ -639,7 +639,7 @@ log.error.ConsoleAppender.enabled = true
 log.error.FileAppender.enabled = false
 log.error.FileAppender.pathname = /var/log/cantaloupe/cantaloupe.error.log
 
-log.error.RollingFileAppender.enabled = true
+log.error.RollingFileAppender.enabled = false
 log.error.RollingFileAppender.pathname = /var/log/cantaloupe/cantaloupe.error.log
 log.error.RollingFileAppender.policy = TimeBasedRollingPolicy
 log.error.RollingFileAppender.TimeBasedRollingPolicy.filename_pattern = /var/log/cantaloupe/cantaloupe.error-%d{yyyy-MM-dd}.log
@@ -657,7 +657,7 @@ log.access.FileAppender.pathname = /var/log/cantaloupe/access-cantaloupe.log
 
 # RollingFileAppender is an alternative to using something like
 # FileAppender + logrotate.
-log.access.RollingFileAppender.enabled = true
+log.access.RollingFileAppender.enabled = false
 log.access.RollingFileAppender.pathname = /var/log/cantaloupe/access-cantaloupe.log
 log.access.RollingFileAppender.policy = TimeBasedRollingPolicy
 log.access.RollingFileAppender.TimeBasedRollingPolicy.filename_pattern = /var/log/cantaloupe/access-cantaloupe.log-%d{yyyy-MM-dd}.log
