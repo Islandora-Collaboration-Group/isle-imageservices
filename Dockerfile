@@ -1,4 +1,4 @@
-FROM islandoracollabgroup/isle-tomcat:1.1.1
+FROM islandoracollabgroup/isle-tomcat:dashboards-dev
 
 ## Dependencies 
 RUN GEN_DEP_PACKS="ffmpeg \
