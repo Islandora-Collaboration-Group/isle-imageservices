@@ -7,5 +7,6 @@ mode = "0644"
 keys = [
   "/cantaloupe/admin/interface/enable",
   "/cantaloupe/admin/user",
-  "/cantaloupe/admin/pass"
+  "/cantaloupe/admin/pass",
+  "/cantaloupe/log/application/level"  
 ]
