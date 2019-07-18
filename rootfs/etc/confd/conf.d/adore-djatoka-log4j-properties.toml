@@ -1,9 +1,0 @@
-[template]
-src = "imageserv/adore-djatoka.log4j.properties.tpl"
-dest = "/usr/local/adore-djatoka-1.1/bin/log4j.properties"
-uid = 1000
-gid = 1000
-mode = "0644"
-keys = [
-  "/adore/djatoka/root/logger"
-]
