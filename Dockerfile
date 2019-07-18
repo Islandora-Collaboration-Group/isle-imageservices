@@ -1,4 +1,4 @@
-FROM islandoracollabgroup/isle-tomcat:1.2.0-dev
+FROM borndigital/isle-tomcat:1.2.0-dev
 
 ## Dependencies 
 RUN GEN_DEP_PACKS="ffmpeg \
