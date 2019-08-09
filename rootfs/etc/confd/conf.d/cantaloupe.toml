@@ -8,4 +8,5 @@ keys = [
   "/cantaloupe/admin/interface/enable",
   "/cantaloupe/admin/user",
   "/cantaloupe/admin/pass",
+  "/cantaloupe/log/application/level"
 ]

@@ -643,7 +643,7 @@ redaction.enabled = false
 #----------------------------------------
 
 # `trace`, `debug`, `info`, `warn`, `error`, `all`, or `off`
-log.application.level = error
+log.application.level = {{getv "/cantaloupe/log/application/level"}}
 
 log.application.ConsoleAppender.enabled = true
 
@@ -651,7 +651,7 @@ log.application.ConsoleAppender.enabled = true
 log.application.FileAppender.enabled = false
 log.application.FileAppender.pathname = /usr/local/tomcat/logs/cantaloupe/cantaloupe.log
 
-log.application.RollingFileAppender.enabled = true
+log.application.RollingFileAppender.enabled = false
 log.application.RollingFileAppender.pathname = /usr/local/tomcat/logs/cantaloupe/cantaloupe.log
 log.application.RollingFileAppender.policy = TimeBasedRollingPolicy
 log.application.RollingFileAppender.TimeBasedRollingPolicy.filename_pattern = /usr/local/tomcat/logs/cantaloupe/cantaloupe-%d{yyyy-MM-dd}.log
@@ -675,7 +675,7 @@ log.application.SyslogAppender.facility = LOCAL0
 log.error.FileAppender.enabled = false
 log.error.FileAppender.pathname = /usr/local/tomcat/logs/cantaloupe/cantaloupe.error.log
 
-log.error.RollingFileAppender.enabled = true
+log.error.RollingFileAppender.enabled = false
 log.error.RollingFileAppender.pathname = /usr/local/tomcat/logs/cantaloupe/cantaloupe.error.log
 log.error.RollingFileAppender.policy = TimeBasedRollingPolicy
 log.error.RollingFileAppender.TimeBasedRollingPolicy.filename_pattern = /usr/local/tomcat/logs/cantaloupe/cantaloupe.error-%d{yyyy-MM-dd}.log
@@ -693,7 +693,7 @@ log.access.FileAppender.pathname = /usr/local/tomcat/logs/cantaloupe/access-cant
 
 # RollingFileAppender is an alternative to using something like
 # FileAppender + logrotate.
-log.access.RollingFileAppender.enabled = true
+log.access.RollingFileAppender.enabled = false
 log.access.RollingFileAppender.pathname = /usr/local/tomcat/logs/cantaloupe/access-cantaloupe.log
 log.access.RollingFileAppender.policy = TimeBasedRollingPolicy
 log.access.RollingFileAppender.TimeBasedRollingPolicy.filename_pattern = /usr/local/tomcat/logs/cantaloupe/access-cantaloupe.log-%d{yyyy-MM-dd}.log
