@@ -69,7 +69,8 @@ RUN cd /tmp && \
     curl -O -L https://github.com/medusa-project/cantaloupe/releases/download/v4.0.1/cantaloupe-4.0.1.zip && \
     unzip cantaloupe-*.zip && \
     rm cantaloupe-4.0.1/*.sample && \
-    mkdir -p /usr/local/cantaloupe /usr/local/cantaloupe/temp /usr/local/cantaloupe/cache /usr/local/tomcat/logs/cantaloupe && \
+    ln -s /usr/local/cantaloupe4 /usr/local/cantaloupe
+    mkdir -p /usr/local/cantaloupe/temp /usr/local/cantaloupe/cache /usr/local/tomcat/logs/cantaloupe && \
     cp -r cantaloupe-4.0.1/* /usr/local/cantaloupe && \
     chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
@@ -89,7 +90,7 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70' \
     KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
-    CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe4/cantaloupe.properties \
+    CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
     -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
     -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
