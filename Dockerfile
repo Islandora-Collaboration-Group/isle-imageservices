@@ -69,10 +69,8 @@ RUN cd /tmp && \
     curl -O -L https://github.com/medusa-project/cantaloupe/releases/download/v4.0.1/cantaloupe-4.0.1.zip && \
     unzip cantaloupe-*.zip && \
     rm cantaloupe-4.0.1/*.sample && \ 
-    mkdir /usr/local/cantaloupe4 && \
+    mkdir -p /usr/local/cantaloupe4/temp /usr/local/cantaloupe4/cache /usr/local/tomcat/logs/cantaloupe && \
     ln -s /usr/local/cantaloupe4 /usr/local/cantaloupe && \
-    mkdir /usr/local/cantaloupe4/temp /usr/local/cantaloupe4/cache  && \
-    mkdir -p /usr/local/tomcat/logs/cantaloupe && \
     cp -r cantaloupe-4.0.1/* /usr/local/cantaloupe && \
     chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
