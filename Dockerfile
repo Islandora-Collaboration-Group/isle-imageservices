@@ -1,4 +1,18 @@
-FROM islandoracollabgroup/isle-tomcat:1.2.0
+FROM islandoracollabgroup/isle-tomcat:1.3.0
+
+# Set up environmental variables for tomcat & dependencies
+ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
+    JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
+    ## Per Gavin, we are no longer using -XX:+UseConcMarkSweepGC, instead G1GC.
+    JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70' \
+    KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
+    CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
+    -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
+    -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
+    -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.0.3}
 
 ## Dependencies 
 RUN GEN_DEP_PACKS="ffmpeg \
@@ -64,36 +78,25 @@ RUN BUILD_DEPS="build-essential \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-## Cantaloupe 4.0.1
+
+## Cantaloupe
 RUN cd /tmp && \
-    curl -O -L https://github.com/medusa-project/cantaloupe/releases/download/v4.0.1/cantaloupe-4.0.1.zip && \
-    unzip cantaloupe-*.zip && \
-    rm cantaloupe-4.0.1/*.sample && \
+    curl -O -L https://github.com/medusa-project/cantaloupe/releases/download/v$CANTALOUPE_VERSION/cantaloupe-$CANTALOUPE_VERSION.zip && \
+    unzip cantaloupe-$CANTALOUPE_VERSION.zip && \
+    rm cantaloupe-$CANTALOUPE_VERSION/*.sample && \
     mkdir -p /usr/local/cantaloupe /usr/local/cantaloupe/temp /usr/local/cantaloupe/cache /usr/local/tomcat/logs/cantaloupe && \
-    cp -r cantaloupe-4.0.1/* /usr/local/cantaloupe && \
+    cp -r cantaloupe-$CANTALOUPE_VERSION/* /usr/local/cantaloupe && \
     chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
-    mv /usr/local/cantaloupe/cantaloupe-4.0.1.war /usr/local/tomcat/webapps/cantaloupe.war && \
+    mv /usr/local/cantaloupe/cantaloupe-$CANTALOUPE_VERSION.war /usr/local/tomcat/webapps/cantaloupe.war && \
     unzip /usr/local/tomcat/webapps/cantaloupe.war -d /usr/local/tomcat/webapps/cantaloupe && \
     chown tomcat /usr/local/cantaloupe -R && \
     ## Cleanup Phase.
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Set up environmental variables for tomcat & dependencies
-ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
-    JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
-    ## Per Gavin, we are no longer using -XX:+UseConcMarkSweepGC, instead G1GC.
-    JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70' \
-    KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
-    CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe4/cantaloupe.properties \
-    -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-    -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
-    -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib"
 
 # Labels
 ARG BUILD_DATE
