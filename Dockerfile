@@ -1,4 +1,4 @@
-FROM borndigital/isle-tomcat:1.3.0-dev
+FROM islandoracollabgroup/isle-tomcat:1.3.0
 
 # Set up environmental variables for tomcat & dependencies
 ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
