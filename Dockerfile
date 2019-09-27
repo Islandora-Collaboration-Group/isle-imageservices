@@ -49,6 +49,7 @@ RUN BUILD_DEPS="build-essential \
     libwmf-dev \
     libwebp-dev \
     libwmf-dev \
+    libltdl-dev  \
     zlib1g-dev" && \
     ## I believe these are unused and actually install by libavcodec-extra.
     IMAGEMAGICK_LIBS_EXTENDED="libfontconfig \
