@@ -1,6 +1,8 @@
-FROM islandoracollabgroup/isle-tomcat:1.4.0
+# FROM islandoracollabgroup/isle-tomcat:1.4.0
+FROM borndigital/isle-tomcat:1.4.1-dev
 
-# Set up environmental variables for tomcat & dependencies
+# Set up environmental variables for Tomcat, Cantaloupe & dependencies
+# @see: Cantaloupe https://cantaloupe-project.github.io/
 ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
     ## Per Gavin, we are no longer using -XX:+UseConcMarkSweepGC, instead G1GC.
@@ -29,6 +31,7 @@ RUN GEN_DEP_PACKS="ffmpeg \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ## ImageMagick and OpenJPG
+# @see: ImageMagick https://github.com/ImageMagick/ImageMagick/releases & OpenJPG https://github.com/uclouvain/openjpeg/releases
 RUN BUILD_DEPS="build-essential \
     cmake \
     pkg-config \
