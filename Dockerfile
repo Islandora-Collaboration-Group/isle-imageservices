@@ -13,7 +13,14 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
     -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
-    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.0.3}
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.5}
+    CANTALOUPE_RELEASE=$CANTALOUPE_RELEASE:-release/4.1} \
+    PATH=$PATH:/opt/maven/bin:/opt/ant/bin \
+    MAVEN_HOME=/opt/maven \
+    ANT_HOME=/opt/ant \
+    MAVEN_MAJOR=${MAVEN_MAJOR:-3} \
+    MAVEN_VERSION=${MAVEN_VERSION:-3.6.3} \
+    ANT_VERSION=${ANT_VERSION:-1.10.7}
 
 ## Dependencies 
 RUN GEN_DEP_PACKS="ffmpeg \
@@ -82,19 +89,37 @@ RUN BUILD_DEPS="build-essential \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
-## Cantaloupe
+## ANT AND MAVEN ENV
+ARG MAVEN_MAJOR
+ARG MAVEN_VERSION
+ARG ANT_VERSION
+
+RUN mkdir -p $ANT_HOME $MAVEN_HOME && \
+    cd /tmp && \
+    curl -O -L "https://www.apache.org/dyn/closer.cgi?action=download&filename=maven/maven-$MAVEN_MAJOR/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" && \
+    tar xzf /tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C $MAVEN_HOME --strip-components=1 && \
+    curl -O -L "https://www.apache.org/dyn/closer.cgi?action=download&filename=ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" && \
+    tar xzf /tmp/apache-ant-$ANT_VERSION-bin.tar.gz -C $ANT_HOME --strip-components=1 && \
+    cd $ANT_HOME && \
+    ant -f fetch.xml -Ddest=system && \
+    ## Cleanup phase.
+    rm -rf /tmp/* /var/tmp/* $ANT_HOME/bin/*.bat
+
+
+## Cantaloupe new
 RUN cd /tmp && \
-    curl -O -L https://github.com/medusa-project/cantaloupe/releases/download/v$CANTALOUPE_VERSION/cantaloupe-$CANTALOUPE_VERSION.zip && \
-    unzip cantaloupe-$CANTALOUPE_VERSION.zip && \
-    rm cantaloupe-$CANTALOUPE_VERSION/*.sample && \
+    git clone -b $CANTALOUPE_RELEASE https://github.com/cantaloupe-project/cantaloupe && \
+    cd /tmp/cantaloupe && \
     mkdir -p /usr/local/cantaloupe /usr/local/cantaloupe/temp /usr/local/cantaloupe/cache /usr/local/tomcat/logs/cantaloupe && \
-    cp -r cantaloupe-$CANTALOUPE_VERSION/* /usr/local/cantaloupe && \
+    cp -r /tmp/cantaloupe/dist/deps /usr/local/cantaloupe && \ 
     chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
     ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
-    mv /usr/local/cantaloupe/cantaloupe-$CANTALOUPE_VERSION.war /usr/local/tomcat/webapps/cantaloupe.war && \
+    ## Attention: This will take about half an hour.
+    mvn clean package -DskipTests && \
+    mv /tmp/cantaloupe/target/cantaloupe-$CANTALOUPE_VERSION-SNAPSHOT.war /usr/local/tomcat/webapps/cantaloupe.war && \
     unzip /usr/local/tomcat/webapps/cantaloupe.war -d /usr/local/tomcat/webapps/cantaloupe && \
     chown tomcat /usr/local/cantaloupe -R && \
     ## Cleanup Phase.
