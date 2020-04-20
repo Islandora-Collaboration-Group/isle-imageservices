@@ -1,12 +1,11 @@
 ##
 # Sample Ruby delegate script containing stubs and documentation for all
-# available delegate methods. See the "Delegate Script" section of the user
-# manual for more information.
+# available delegate methods. See the user manual for more information.
 #
 # The application will create an instance of this class early in the request
 # cycle and dispose of it at the end of the request cycle. Instances don't need
 # to be thread-safe, but sharing information across instances (requests)
-# **does** need to be thread-safe.
+# **does** need to be done thread-safely.
 #
 # This version of the script works with Cantaloupe version 4, and not earlier
 # versions. Likewise, earlier versions of the script are not compatible with
@@ -27,11 +26,14 @@ class CustomDelegate
   #
   # The hash will contain the following keys in response to all requests:
   #
-  # * `client_ip`       [String] Client IP address.
-  # * `cookies`         [Hash<String,String>] Hash of cookie name-value pairs.
-  # * `identifier`      [String] Image identifier.
-  # * `request_headers` [Hash<String,String>] Hash of header name-value pairs.
-  # * `request_uri`     [String] Public request URI.
+  # * `client_ip`        [String] Client IP address.
+  # * `cookies`          [Hash<String,String>] Hash of cookie name-value pairs.
+  # * `identifier`       [String] Image identifier.
+  # * `request_headers`  [Hash<String,String>] Hash of header name-value pairs.
+  # * `request_uri`      [String] Public request URI.
+  # * `scale_constraint` [Array<Integer>] Two-element array with scale
+  #                      constraint numerator at position 0 and denominator at
+  #                      position 1.
   #
   # It will contain the following additional string keys in response to image
   # requests:
@@ -55,28 +57,34 @@ class CustomDelegate
   attr_accessor :context
 
   ##
-  # Tells the server whether to redirect in response to the request. Will be
-  # called upon all image requests.
-  #
-  # @param options [Hash] Empty hash.
-  # @return [Hash<String,Object>,nil] Hash with `location` and `status_code`
-  #         keys. `location` must be a URI string; `status_code` must be an
-  #         integer from 300 to 399. Return nil for no redirect.
-  #
-  def redirect(options = {})
-  end
-
-  ##
-  # Tells the server whether the given request is authorized. Will be called
-  # upon all image requests to any endpoint.
+  # Returns authorization status for the current request. Will be called upon
+  # all requests to all public endpoints.
   #
   # Implementations should assume that the underlying resource is available,
   # and not try to check for it.
   #
-  # @param options [Hash] Empty hash.
-  # @return [Boolean] Whether the request is authorized.
+  # Possible return values:
   #
-  def authorized?(options = {})
+  # 1. Boolean true/false, indicating whether the request is fully authorized
+  #    or not. If false, the client will receive a 403 Forbidden response.
+  # 2. Hash with a `status_code` key.
+  #     a. If it corresponds to an integer from 200-299, the request is
+  #        authorized.
+  #     b. If it corresponds to an integer from 300-399:
+  #         i. If the hash also contains a `location` key corresponding to a
+  #            URI string, the request will be redirected to that URI using
+  #            that code.
+  #         ii. If the hash also contains `scale_numerator` and
+  #            `scale_denominator` keys, the request will be
+  #            redirected using that code to a virtual reduced-scale version of
+  #            the source image.
+  #     c. If it corresponds to 401, the hash must include a `challenge` key
+  #        corresponding to a WWW-Authenticate header value.
+  #
+  # @param options [Hash] Empty hash.
+  # @return [Boolean,Hash<String,Object>] See above.
+  #
+  def authorize(options = {})
     true
   end
 
@@ -117,6 +125,9 @@ class CustomDelegate
   end
 
   ##
+  # N.B.: this method should not try to perform authorization. `authorize()`
+  # should be used instead.
+  #
   # @param options [Hash] Empty hash.
   # @return [String,nil] Blob key of the image corresponding to the given
   #                      identifier, or nil if not found.
@@ -125,6 +136,9 @@ class CustomDelegate
   end
 
   ##
+  # N.B.: this method should not try to perform authorization. `authorize()`
+  # should be used instead.
+  #
   # @param options [Hash] Empty hash.
   # @return [String,nil] Absolute pathname of the image corresponding to the
   #                      given identifier, or nil if not found.
@@ -133,24 +147,40 @@ class CustomDelegate
   end
 
   ##
+  # Returns one of the following:
+  #
+  # 1. String URI
+  # 2. Hash with the following keys:
+  #     * `uri` [String] (required)
+  #     * `username` [String] For HTTP Basic authentication (optional).
+  #     * `secret` [String] For HTTP Basic authentication (optional).
+  #     * `headers` [Hash<String,String>] Hash of request headers (optional).
+  # 3. nil if not found.
+  #
+  # N.B.: this method should not try to perform authorization. `authorize()`
+  # should be used instead.
+  #
   # @param options [Hash] Empty hash.
-  # @return [String,Hash<String,String>,nil] String URI; Hash with `uri` key,
-  #         and optionally `username` and `secret` keys; or nil if not found.
+  # @return See above.
   #
   def httpsource_resource_info(options = {})
-    identifier = context['identifier']
+    logger = Java::edu.illinois.library.cantaloupe.script.Logger
     require 'cgi'
-    values = CGI::unescape(identifier).split('~')
-    if values.length != 3
+    values = CGI::unescape(context['identifier']).split('~')
+    if values.length != 2
       return nil
     end
+    token = context['request_headers']['x-islandora-token']
+    logger.info("Token #{token}.")
     pid = values[0]
     dsid = values[1]
-    token = values[2]
-    return "http://apache/islandora/object/#{pid}/datastream/#{dsid}/view?token=#{token}"
+    return { 'uri' => "http://apache/islandora/object/#{pid}/datastream/#{dsid}/view?token=#{token}"}
   end
 
   ##
+  # N.B.: this method should not try to perform authorization. `authorize()`
+  # should be used instead.
+  #
   # @param options [Hash] Empty hash.
   # @return [String] Identifier of the image corresponding to the given
   #                  identifier in the database.
@@ -180,6 +210,9 @@ class CustomDelegate
   end
 
   ##
+  # N.B.: this method should not try to perform authorization. `authorize()`
+  # should be used instead.
+  #
   # @param options [Hash] Empty hash.
   # @return [Hash<String,Object>,nil] Hash containing `bucket` and `key` keys;
   #                                   or nil if not found.
