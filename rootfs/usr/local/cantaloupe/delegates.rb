@@ -167,15 +167,29 @@ class CustomDelegate
     logger = Java::edu.illinois.library.cantaloupe.script.Logger
     require 'cgi'
     values = CGI::unescape(context['identifier']).split('~')
-    if values.length != 2
+    
+    if values.length == 2
+      # case for when the token is passed in the header and the query string is e.g. [pid~dsid]
+      return nil
+      token = context['request_headers']['x-islandora-token']
+      logger.info("Token #{token}.")
+      pid = values[0]
+      dsid = values[1]
+    
+      return { 'uri' => "http://apache/islandora/object/#{pid}/datastream/#{dsid}/view?token=#{token}"}
+    elsif values.length == 3
+      # case for when the token is passed in the query string, e.g. [pid~dsid~token]
+      pid = values[0]
+      dsid = values[1]
+      token = values[2]
+      # return "http://apache/islandora/object/#{pid}/datastream/#{dsid}/view?token=#{token}"
+      return { 'uri' => "http://apache/islandora/object/#{pid}/datastream/#{dsid}/view?token=#{token}"}
+    else
+      # invalid query string
       return nil
     end
-    token = context['request_headers']['x-islandora-token']
-    logger.info("Token #{token}.")
-    pid = values[0]
-    dsid = values[1]
-    return { 'uri' => "http://apache/islandora/object/#{pid}/datastream/#{dsid}/view?token=#{token}"}
-  end
+    
+  end  
 
   ##
   # N.B.: this method should not try to perform authorization. `authorize()`
