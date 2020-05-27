@@ -5,7 +5,7 @@ Running Cantaloupe as a IIIF compliant image server for ISLE.
 
 Based on:
   - [ISLE-tomcat](https://github.com/Islandora-Collaboration-Group/isle-tomcat)
-  - [Cantaloupe 4.0.3](https://medusa-project.github.io/cantaloupe/) an IIIF compliant open-source dynamic image server
+  - [Cantaloupe 4.1.5](https://medusa-project.github.io/cantaloupe/) an IIIF compliant open-source dynamic image server
 
 Contains and Includes:
   - [ImageMagick 7](https://www.imagemagick.org/)
