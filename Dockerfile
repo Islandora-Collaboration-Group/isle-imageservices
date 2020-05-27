@@ -1,4 +1,4 @@
-FROM islandoracollabgroup/isle-tomcat:1.4.2
+FROM islandoracollabgroup/isle-tomcat:1.5.0
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
@@ -13,7 +13,8 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
     -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
-    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.0.3}
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.5}
+
 
 ## Dependencies 
 RUN GEN_DEP_PACKS="ffmpeg \
