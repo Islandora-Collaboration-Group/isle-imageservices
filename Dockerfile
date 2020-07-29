@@ -1,4 +1,5 @@
-FROM islandoracollabgroup/isle-tomcat:1.5.0
+#FROM islandoracollabgroup/isle-tomcat:1.5.0
+FROM borndigital/isle-tomcat:1.5.1-dev
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
@@ -6,14 +7,11 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
     ## Per Gavin, we are no longer using -XX:+UseConcMarkSweepGC, instead G1GC.
     JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70' \
-    KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
     CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
     -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-    -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
     -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
-    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.5}
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.6}
 
 
 ## Dependencies 
