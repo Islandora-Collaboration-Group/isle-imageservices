@@ -11,7 +11,15 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
     -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
     -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
-    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.6}
+    # To use Kakadu for uniqe builds - uncomment this below and comment out the above code.
+    #KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    #KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
+    #CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
+    #-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
+    #-Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    #-Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
+    #-DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.6} 
 
 
 ## Dependencies 
@@ -88,11 +96,12 @@ RUN cd /tmp && \
     rm cantaloupe-$CANTALOUPE_VERSION/*.sample && \
     mkdir -p /usr/local/cantaloupe /usr/local/cantaloupe/temp /usr/local/cantaloupe/cache /usr/local/tomcat/logs/cantaloupe && \
     cp -r cantaloupe-$CANTALOUPE_VERSION/* /usr/local/cantaloupe && \
-    chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
+    # Uncomment here to use the Kakadu demo or licensed processor
+    # chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
     mv /usr/local/cantaloupe/cantaloupe-$CANTALOUPE_VERSION.war /usr/local/tomcat/webapps/cantaloupe.war && \
     unzip /usr/local/tomcat/webapps/cantaloupe.war -d /usr/local/tomcat/webapps/cantaloupe && \
     chown tomcat /usr/local/cantaloupe -R && \
