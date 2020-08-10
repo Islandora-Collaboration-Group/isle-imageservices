@@ -34,7 +34,7 @@ https.key_password = myPassword
 
 # !! Maximum size of the HTTP(S) request queue. Leave blank to use the
 # default.
-http.accept_queue_limit = 0
+http.accept_queue_limit =
 
 # Base URI to use for internal links, such as Link headers and JSON-LD
 # @id values, in a reverse-proxy context. This should only be used when
@@ -51,9 +51,11 @@ slash_substitute =
 # Maximum number of pixels to return in a response, to prevent overloading
 # the server. Requests for more pixels than this will receive an error
 # response. Set to 0 for no maximum.
-max_pixels = 400000000
+max_pixels = 100000000
 
-# Errors will also be logged to the error log (if enabled).
+# Maximum scale to allow (1.0 = full scale; 0 = no maximum).
+max_scale = 1.0
+
 print_stack_trace_on_error_pages = true
 
 ###########################################################################
@@ -76,11 +78,6 @@ delegate_script.cache.enabled = false
 ###########################################################################
 # ENDPOINTS
 ###########################################################################
-
-# !! Configures HTTP Basic authentication in all public endpoints.
-endpoint.public.auth.basic.enabled = false
-endpoint.public.auth.basic.username = myself
-endpoint.public.auth.basic.secret = mypassword
 
 # Enables the IIIF Image API 1.x endpoint, at /iiif/1.
 endpoint.iiif.1.enabled = true
@@ -149,7 +146,10 @@ FilesystemSource.BasicLookupStrategy.path_suffix =
 # HttpSource
 #----------------------------------------
 
-HttpSource.trust_all_certs = false
+# Trusts insecure certificates and cipher suites.
+HttpSource.allow_insecure = true
+
+# Request timeout in seconds.
 HttpSource.request_timeout =
 
 # Tells HttpSource how to look up resources. Allowed values are
@@ -159,7 +159,7 @@ HttpSource.lookup_strategy = ScriptLookupStrategy
 
 # URL that will be prefixed to the identifier in the request URL.
 # Trailing slash is important!
-HttpSource.BasicLookupStrategy.url_prefix = 
+HttpSource.BasicLookupStrategy.url_prefix = http://localhost/images/
 
 # Path, extension, query string, etc. that will be suffixed to the
 # identifier in the request URL.
@@ -169,23 +169,19 @@ HttpSource.BasicLookupStrategy.url_suffix =
 HttpSource.BasicLookupStrategy.auth.basic.username =
 HttpSource.BasicLookupStrategy.auth.basic.secret =
 
-#----------------------------------------
-# JdbcSource
-#----------------------------------------
+# Read data in chunks when it may be more efficient. (This also may end up
+# being less efficient, depending on many variables; see the user manual.)
+HttpSource.chunking.enabled = true
 
-# Note: JdbcSource requires some delegate methods to be implemented in
-# addition to the configuration here, and a JDBC driver to be installed on
-# the classpath; see the user manual.
+# Chunk size.
+HttpSource.chunking.chunk_size = 512K
 
-# !!
-JdbcSource.url = jdbc:postgresql://localhost:5432/my_database
-# !!
-JdbcSource.user = postgres
-# !!
-JdbcSource.password = postgres
+# The per-request chunk cache caches downloaded chunks in memory during
+# a request, and clears them when the request is complete.
+HttpSource.chunking.cache.enabled = true
 
-# !! Connection timeout in seconds.
-JdbcSource.connection_timeout = 10
+# Max per-request chunk cache size.
+HttpSource.chunking.cache.max_size = 5M
 
 #----------------------------------------
 # S3Source
@@ -203,13 +199,9 @@ S3Source.endpoint =
 S3Source.access_key_id =
 S3Source.secret_key =
 
-# !! Maximum number of concurrent HTTP connections to AWS. Leave blank to
-# use the default.
-S3Source.max_connections =
-
-# Tells S3Source how to look up objects. Allowed values are
-# `BasicLookupStrategy` and `ScriptLookupStrategy`. ScriptLookupStrategy
-# uses a delegate method for dynamic lookups; see the user manual.
+# How to look up objects. Allowed values are `BasicLookupStrategy` and
+# `ScriptLookupStrategy`. ScriptLookupStrategy uses a delegate method for
+# dynamic lookups; see the user manual.
 S3Source.lookup_strategy = BasicLookupStrategy
 
 # !! Name of the bucket containing images to be served.
@@ -221,6 +213,20 @@ S3Source.BasicLookupStrategy.path_prefix =
 
 # Path or extension that will be suffixed to the identifier in the URL.
 S3Source.BasicLookupStrategy.path_suffix =
+
+# Read data in chunks when it may be more efficient. (This also may end up
+# being less efficient, depending on many variables; see the user manual.)
+S3Source.chunking.enabled = true
+
+# Chunk size.
+S3Source.chunking.chunk_size = 512K
+
+# The per-request chunk cache caches downloaded chunks in memory during
+# a request, and clears them when the request is complete.
+S3Source.chunking.cache.enabled = true
+
+# Max per-request chunk cache size.
+S3Source.chunking.cache.max_size = 5M
 
 #----------------------------------------
 # AzureStorageSource
@@ -243,6 +249,38 @@ AzureStorageSource.container_name =
 # uses a delegate method for dynamic lookups; see the user manual.
 AzureStorageSource.lookup_strategy = BasicLookupStrategy
 
+# Read data in chunks when it may be more efficient. (This also may end up
+# being less efficient, depending on many variables; see the user manual.)
+AzureStorageSource.chunking.enabled = true
+
+# Chunk size.
+AzureStorageSource.chunking.chunk_size = 512K
+
+# The per-request chunk cache caches downloaded chunks in memory during
+# a request, and clears them when the request is complete.
+AzureStorageSource.chunking.cache.enabled = true
+
+# Max per-request chunk cache size.
+AzureStorageSource.chunking.cache.max_size = 5M
+
+#----------------------------------------
+# JdbcSource
+#----------------------------------------
+
+# Note: JdbcSource requires some delegate methods to be implemented in
+# addition to the configuration here, and a JDBC driver to be installed on
+# the classpath; see the user manual.
+
+# !!
+JdbcSource.url = jdbc:postgresql://localhost:5432/my_database
+# !!
+JdbcSource.user = postgres
+# !!
+JdbcSource.password = postgres
+
+# !! Connection timeout in seconds.
+JdbcSource.connection_timeout = 10
+
 ###########################################################################
 # PROCESSORS
 ###########################################################################
@@ -251,30 +289,38 @@ AzureStorageSource.lookup_strategy = BasicLookupStrategy
 # Processor Selection
 #----------------------------------------
 
-# Image processors to use for various source formats. Available values are
-# `Java2dProcessor`, `GraphicsMagickProcessor`, `ImageMagickProcessor`,
-# `KakaduDemoProcessor`, `KakaduNativeProcessor`, `OpenJpegProcessor`,
-# `JaiProcessor`, `PdfBoxProcessor`, and `FfmpegProcessor`.
+# * If set to `AutomaticSelectionStrategy`, a "best" available processor
+#   will be selected per-request based on formats and installed
+#   dependencies.
+# * If set to `ManualSelectionStrategy`, a processor will be chosen based
+#   on the rest of the keys in this section.
+processor.selection_strategy = ManualSelectionStrategy
 
-# These extension-specific definitions are optional.
-processor.avi = FfmpegProcessor
-processor.bmp = ImageMagickProcessor
-processor.dcm = ImageMagickProcessor
-processor.flv = FfmpegProcessor
-processor.gif = ImageMagickProcessor
-processor.jp2 = OpenJpegProcessor
-processor.jpg = ImageMagickProcessor
-processor.mov = FfmpegProcessor
-processor.mp4 = FfmpegProcessor
-processor.mpg = FfmpegProcessor
-processor.pdf = PdfBoxProcessor
-processor.png = ImageMagickProcessor
-processor.tif = ImageMagickProcessor
-processor.webm = FfmpegProcessor
-processor.webp = ImageMagickProcessor
+# Built-in processors are `Java2dProcessor`, `GraphicsMagickProcessor`,
+# `ImageMagickProcessor`, `TurboJpegProcessor`, `KakaduNativeProcessor`,
+# `KakaduDemoProcessor`, `OpenJpegProcessor`, `JaiProcessor`,
+# `PdfBoxProcessor`, and `FfmpegProcessor`.
+# Some of these have third-party dependencies and won't work out-of-the-box.
+
+# These format-specific definitions are optional.
+processor.ManualSelectionStrategy.avi = FfmpegProcessor
+processor.ManualSelectionStrategy.bmp = ImageMagickProcessor
+processor.ManualSelectionStrategy.dcm = ImageMagickProcessor
+processor.ManualSelectionStrategy.flv = FfmpegProcessor
+processor.ManualSelectionStrategy.gif = ImageMagickProcessor
+processor.ManualSelectionStrategy.jp2 = OpenJpegProcessor
+processor.ManualSelectionStrategy.jpg = ImageMagickProcessor
+processor.ManualSelectionStrategy.mov = FfmpegProcessor
+processor.ManualSelectionStrategy.mp4 = FfmpegProcessor
+processor.ManualSelectionStrategy.mpg = FfmpegProcessor
+processor.ManualSelectionStrategy.pdf = PdfBoxProcessor
+processor.ManualSelectionStrategy.png = ImageMagickProcessor
+processor.ManualSelectionStrategy.tif = ImageMagickProcessor
+processor.ManualSelectionStrategy.webm = FfmpegProcessor
+processor.ManualSelectionStrategy.webp = ImageMagickProcessor
 
 # Fall back to this processor for any formats not assigned above.
-processor.fallback = Java2dProcessor
+processor.ManualSelectionStrategy.fallback = Java2dProcessor
 
 #----------------------------------------
 # Global Processor Configuration
@@ -298,10 +344,6 @@ processor.fallback_retrieval_strategy = DownloadStrategy
 
 # Resolution of vector rasterization (of e.g. PDFs) at a scale of 1.
 processor.dpi = 150
-
-# Expands contrast to utilize available dynamic range. This usually requires
-# the whole source image to be read into memory, so it can be inefficient.
-processor.normalize = false
 
 # Color of the background when an image is rotated or alpha-flattened, for
 # output formats that don't support transparency.
@@ -580,7 +622,7 @@ overlays.BasicStrategy.type = image
 overlays.BasicStrategy.image = /path/to/overlay.png
 
 # Overlay text.
-overlays.BasicStrategy.string = Copyright \u00A9️ My Great Organization\nAll rights reserved.
+overlays.BasicStrategy.string = Copyright © My Great Organization\nAll rights reserved.
 
 # For possible values, launch with the -Dcantaloupe.list_fonts option.
 overlays.BasicStrategy.string.font = Helvetica
@@ -613,10 +655,12 @@ overlays.BasicStrategy.string.stroke.width = 1
 overlays.BasicStrategy.string.background.color = rgba(0, 0, 0, 100)
 
 # Allowed values: `top left`, `top center`, `top right`, `left center`,
-# `center`, `right center`, `bottom left`, `bottom center`, `bottom right`.
+# `center`, `right center`, `bottom left`, `bottom center`, `bottom right`,
+# `repeat` (images only).
 overlays.BasicStrategy.position = bottom right
 
-# Pixel margin between the overlay and the image edge.
+# Pixel margin between the overlay and the image edge. Does not apply to
+# `repeat` position.
 overlays.BasicStrategy.inset = 10
 
 # Output images less than this many pixels wide will not receive an overlay.

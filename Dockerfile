@@ -5,12 +5,14 @@ FROM borndigital/isle-tomcat:1.5.1-dev
 # @see: Cantaloupe https://cantaloupe-project.github.io/
 ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
-    ## Per Gavin, we are no longer using -XX:+UseConcMarkSweepGC, instead G1GC.
-    ## # To use Kakadu for uniqe builds - comment out these two lines below and uncomment the lines below the comment "To use Kakadu for unique builds"
-    #JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70' \
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.6} \
+    ## # To use Kakadu instead of OpenJpeg as the processor for uniqe builds - comment out these two lines below and uncomment the lines below the comment "To use Kakadu for unique builds"
     JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
-    CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true" \
-    # To use Kakadu for uniqe builds - uncomment this below and comment out the above code.
+    CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
+    -Djava.library.path=/usr/local/lib:/usr/local/tomcat/lib \
+    -DLD_LIBRARY_PATH=/usr/local/lib:/usr/local/tomcat/lib \
+    -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"    
+    ## # To use Kakadu instead of OpenJpeg as the processor for unique builds - uncomment this below and comment out the above code.
     #KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     #KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
     #CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
@@ -18,7 +20,6 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     #-Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     #-Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
     #-DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
-    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.6} 
 
 
 ## Dependencies 
