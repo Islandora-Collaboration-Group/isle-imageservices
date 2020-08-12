@@ -1,19 +1,25 @@
-FROM islandoracollabgroup/isle-tomcat:1.5.0
+FROM islandoracollabgroup/isle-tomcat:1.5.1
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
 ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
-    ## Per Gavin, we are no longer using -XX:+UseConcMarkSweepGC, instead G1GC.
-    JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70' \
-    KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.6} \
+    ## # To use Kakadu instead of OpenJpeg as the processor for uniqe builds - comment out these two lines below and uncomment the lines below the comment "To use Kakadu for unique builds"
+    JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
     CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
     -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-    -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
-    -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib" \
-    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.5}
+    -Djava.library.path=/usr/local/lib:/usr/local/tomcat/lib \
+    -DLD_LIBRARY_PATH=/usr/local/lib:/usr/local/tomcat/lib"
+    ## # To use Kakadu instead of OpenJpeg as the processor for unique builds - uncomment this below and comment out the above code.
+    #KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    #KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
+    #JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
+    #CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
+    #-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
+    #-Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    #-Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
+    #-DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib"
 
 
 ## Dependencies 
@@ -90,11 +96,12 @@ RUN cd /tmp && \
     rm cantaloupe-$CANTALOUPE_VERSION/*.sample && \
     mkdir -p /usr/local/cantaloupe /usr/local/cantaloupe/temp /usr/local/cantaloupe/cache /usr/local/tomcat/logs/cantaloupe && \
     cp -r cantaloupe-$CANTALOUPE_VERSION/* /usr/local/cantaloupe && \
-    chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
-    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
+    # Uncomment here to use the Kakadu demo or licensed processor
+    # chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
+    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
     mv /usr/local/cantaloupe/cantaloupe-$CANTALOUPE_VERSION.war /usr/local/tomcat/webapps/cantaloupe.war && \
     unzip /usr/local/tomcat/webapps/cantaloupe.war -d /usr/local/tomcat/webapps/cantaloupe && \
     chown tomcat /usr/local/cantaloupe -R && \
