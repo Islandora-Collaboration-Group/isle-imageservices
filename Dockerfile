@@ -1,4 +1,4 @@
-FROM islandoracollabgroup/isle-tomcat:1.5.1
+FROM islandoracollabgroup/isle-tomcat:1.5.2
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
@@ -115,7 +115,7 @@ ARG VCS_REF
 ARG VERSION
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="ISLE Image Services" \
-      org.label-schema.description="Serving all your images needs." \
+      org.label-schema.description="Serving all your images needs with IIIF & Cantaloupe." \
       org.label-schema.url="https://islandora-collaboration-group.github.io" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/Islandora-Collaboration-Group/isle-imageservices" \
