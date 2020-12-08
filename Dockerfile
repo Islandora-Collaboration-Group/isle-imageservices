@@ -28,7 +28,6 @@ RUN GEN_DEP_PACKS="ffmpeg \
     ffmpeg2theora \
     libavcodec-extra \
     ghostscript \
-    xpdf \
     poppler-utils" && \
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
     apt-get update && \
