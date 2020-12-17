@@ -1,5 +1,5 @@
 #FROM islandoracollabgroup/isle-tomcat:1.5.3
-FROM borndigital/isle-tomcat:1.5.3-dev
+FROM borndigital/isle-tomcat:1.5.3
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
