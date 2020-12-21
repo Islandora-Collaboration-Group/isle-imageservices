@@ -2,9 +2,11 @@ FROM islandoracollabgroup/isle-tomcat:1.5.3
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
+# @see: ImageMagick https://github.com/ImageMagick/ImageMagick/releases
 ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
     CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.7} \
+    IMAGEMAGICK_VERSION=${IMAGEMAGICK_VERSION:-7.0.10-51} \
     ## # To use Kakadu instead of OpenJpeg as the processor for uniqe builds - comment out these two lines below and uncomment the lines below the comment "To use Kakadu for unique builds"
     JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
     CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
@@ -76,9 +78,9 @@ RUN BUILD_DEPS="build-essential \
     make install && \
     ldconfig && \
     cd /tmp && \
-    curl -O https://www.imagemagick.org/download/ImageMagick.tar.gz && \
-    tar xf ImageMagick.tar.gz && \
-    cd ImageMagick-* && \
+    curl -O -L https://github.com/ImageMagick/ImageMagick/archive/$IMAGEMAGICK_VERSION.tar.gz && \
+    tar xf $IMAGEMAGICK_VERSION.tar.gz && \
+    cd ImageMagick-$IMAGEMAGICK_VERSION && \
     ./configure --enable-hdri --with-quantum-depth=16 --without-magick-plus-plus --without-perl --with-rsvg && \
     make && \
     make install && \
