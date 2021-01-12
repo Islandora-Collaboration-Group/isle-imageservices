@@ -56,6 +56,9 @@ RUN BUILD_DEPS="build-essential \
     libraw-dev \
     librsvg2-dev \
     libtiff-dev \
+    liblcms2-dev \
+    libzstd-dev \
+    libz-dev \
     libwmf-dev \
     libwebp-dev \
     libwmf-dev \
