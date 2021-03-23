@@ -5,10 +5,10 @@ Running Cantaloupe as a IIIF compliant image server for ISLE.
 
 Based on:
 * [ISLE-tomcat](https://github.com/Islandora-Collaboration-Group/isle-tomcat)
-* [Cantaloupe 4.1.6](https://medusa-project.github.io/cantaloupe/) an IIIF compliant open-source dynamic image server
+* [Cantaloupe 4.1.x](https://medusa-project.github.io/cantaloupe/) an IIIF compliant open-source dynamic image server
 
 Contains and Includes:
-* [ImageMagick 7](https://www.imagemagick.org/)
+* [ImageMagick 7.x](https://www.imagemagick.org/)
   * Features: Cipher DPC HDRI OpenMP
   * Delegates (built-in): bzlib djvu mpeg fontconfig freetype jbig jng jpeg lcms lqr lzma openexr openjp2 png ps raw rsvg tiff webp wmf x zlib
 * [OpenJPEG](http://www.openjpeg.org/)
@@ -78,11 +78,11 @@ CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
 * Open a terminal and either clone down this new git repository to your local laptop or `cd` to the project on your laptop
 
 * Build the image
-  * `docker build -t yourdockerimagerepohere/isle-imageservices:1.5.1 .`
+  * `docker build -t yourdockerimagerepohere/isle-imageservices:1.x.x .`
 
 * Push the image to your docker image repo
-  * `docker push yourdockerimagerepohere/isle-imageservices:1.5.1`
+  * `docker push yourdockerimagerepohere/isle-imageservices:1.x.x`
 
 * Use the newly built image in ISLE
-  * Within all of the `docker-compose.*.yml` files in your ISLE project, change `image: islandoracollabgroup/isle-imageservices:1.5.1` to `image: yourdockerimagerepohere/isle-imageservices:1.5.1`
+  * Within all of the `docker-compose.*.yml` files in your ISLE project, change `image: islandoracollabgroup/isle-imageservices:1.x.x` to `image: yourdockerimagerepohere/isle-imageservices:1.x.x`
   * Save all of the files after editing and check the changes into git.
