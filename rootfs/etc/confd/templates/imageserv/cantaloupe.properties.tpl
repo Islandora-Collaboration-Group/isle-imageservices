@@ -463,7 +463,9 @@ cache.server.source = FilesystemCache
 
 # Amount of time source cache content remains valid. Set to blank or 0
 # for forever.
-cache.server.source.ttl_seconds = 2592000
+# Per https://github.com/Islandora-Collaboration-Group/ISLE/issues/207
+# Changed this from default 259200 (30 days)_ to 86400 (1 day)
+cache.server.source.ttl_seconds = 86400
 
 # Enables the derivative (processed image) cache.
 cache.server.derivative.enabled = true
@@ -474,7 +476,9 @@ cache.server.derivative = FilesystemCache
 
 # Amount of time derivative cache content remains valid. Set to blank or 0
 # for forever.
-cache.server.derivative.ttl_seconds = 2592000
+# Per https://github.com/Islandora-Collaboration-Group/ISLE/issues/207
+# Changed this from default 259200 (30 days)_ to 86400 (1 day)
+cache.server.source.ttl_seconds = 86400
 
 # Whether to use the Java heap as a "level 1" cache for image infos, either
 # independently or in front of a "level 2" derivative cache (if enabled).
@@ -493,11 +497,15 @@ cache.server.resolve_first = false
 
 # !! Enables the cache worker, which periodically purges invalid cache
 # items in the background.
-cache.server.worker.enabled = false
+# Per https://github.com/Islandora-Collaboration-Group/ISLE/issues/207
+# Changed to true
+cache.server.worker.enabled = true
 
 # !! The cache worker will wait this many seconds before starting its
 # next shift.
-cache.server.worker.interval = 86400
+# Per https://github.com/Islandora-Collaboration-Group/ISLE/issues/207
+# Changed this from default 86400 to 43200
+cache.server.worker.interval = 43200
 
 #----------------------------------------
 # FilesystemCache
