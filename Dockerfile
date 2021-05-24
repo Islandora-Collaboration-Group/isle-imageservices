@@ -1,4 +1,4 @@
-# FROM islandoracollabgroup/isle-tomcat:1.5.7
+#FROM islandoracollabgroup/isle-tomcat:1.5.7
 FROM borndigital/isle-tomcat:1.5.7
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
@@ -8,22 +8,15 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
     CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.9} \
     IMAGEMAGICK_VERSION=${IMAGEMAGICK_VERSION:-7.0.11-13} \
+    OPENJPEG_VERSION=${OPENJPEG_VERSION:-v2.4.0} \
     ## # To use Kakadu instead of OpenJpeg as the processor for uniqe builds - comment out these two lines below and uncomment the lines below the comment "To use Kakadu for unique builds"
     JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
-    CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
-    -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-    -Djava.library.path=/usr/local/lib:/usr/local/tomcat/lib \
-    -DLD_LIBRARY_PATH=/usr/local/lib:/usr/local/tomcat/lib" \
-    OPENJPEG_VERSION=${OPENJPEG_VERSION:-v2.4.0}
-    ## # To use Kakadu instead of OpenJpeg as the processor for unique builds - uncomment this below, add a \ to the end of the line above and comment out the above code.
+    CATALINA_OPTS='-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.library.path=/usr/local/lib:/usr/local/tomcat/lib -DLD_LIBRARY_PATH=/usr/local/lib:/usr/local/tomcat/lib'
+    ## # To use Kakadu instead of OpenJpeg as the processor for unique builds - uncomment this below and comment out the above code.
     #KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     #KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
     #JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
-    #CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
-    #-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-    #-Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    #-Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
-    #-DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib"
+    #CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib"
 
 
 ## Dependencies 
