@@ -1,27 +1,23 @@
-FROM islandoracollabgroup/isle-tomcat:1.5.6
+FROM islandoracollabgroup/isle-tomcat:1.5.7
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
 # @see: ImageMagick https://github.com/ImageMagick/ImageMagick/releases
 ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
-    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.8} \
-    IMAGEMAGICK_VERSION=${IMAGEMAGICK_VERSION:-7.0.11-6} \
-    ## # To use Kakadu instead of OpenJpeg as the processor for uniqe builds - comment out these two lines below and uncomment the lines below the comment "To use Kakadu for unique builds"
+    CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.9} \
+    IMAGEMAGICK_VERSION=${IMAGEMAGICK_VERSION:-7.0.11-13} \
+    OPENJPEG_VERSION=${OPENJPEG_VERSION:-v2.4.0} \
     JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
+    KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
     CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
     -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-    -Djava.library.path=/usr/local/lib:/usr/local/tomcat/lib \
-    -DLD_LIBRARY_PATH=/usr/local/lib:/usr/local/tomcat/lib"
-    ## # To use Kakadu instead of OpenJpeg as the processor for unique builds - uncomment this below and comment out the above code.
-    #KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    #KAKADU_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib \
-    #JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
-    #CATALINA_OPTS="-Dcantaloupe.config=/usr/local/cantaloupe/cantaloupe.properties \
-    #-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-    #-Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
-    #-Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib \
-    #-DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/tomcat/lib"
+    -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
+    -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/lib:/usr/local/tomcat/lib \
+    -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/lib:/usr/local/tomcat/lib" \
+    CANTALOUPE_PROCESSOR_SELECTION_STRATEGY=${CANTALOUPE_PROCESSOR_SELECTION_STRATEGY:-ManualSelectionStrategy} \
+    CANTALOUPE_PROCESSOR_JP2=${CANTALOUPE_PROCESSOR_JP2:-OpenJpegProcessor}
 
 
 ## Dependencies 
@@ -56,9 +52,7 @@ RUN BUILD_DEPS="build-essential \
     libraw-dev \
     librsvg2-dev \
     libtiff-dev \
-    liblcms2-dev \
     libzstd-dev \
-    libz-dev \
     libwmf-dev \
     libwebp-dev \
     libwmf-dev \
@@ -73,7 +67,7 @@ RUN BUILD_DEPS="build-essential \
     apt-mark auto $BUILD_DEPS && \
     apt-get install -y --no-install-recommends $IMAGEMAGICK_LIBS && \
     cd /tmp && \
-    git clone https://github.com/uclouvain/openjpeg && \
+    git clone -b $OPENJPEG_VERSION https://github.com/uclouvain/openjpeg && \
     cd openjpeg && \
     mkdir build && cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=Release && \
@@ -101,11 +95,11 @@ RUN cd /tmp && \
     mkdir -p /usr/local/cantaloupe /usr/local/cantaloupe/temp /usr/local/cantaloupe/cache /usr/local/tomcat/logs/cantaloupe && \
     cp -r cantaloupe-$CANTALOUPE_VERSION/* /usr/local/cantaloupe && \
     # Uncomment here to use the Kakadu demo or licensed processor
-    # chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
-    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
-    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
-    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
-    # ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
+    chmod 755 /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand && \
+    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/bin/kdu_expand /usr/local/bin/kdu_expand && \
+    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_a7AR.so /usr/local/lib/libkdu_a7AR.so && \
+    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_jni.so /usr/local/lib/libkdu_jni.so && \
+    ln -s /usr/local/cantaloupe/deps/Linux-x86-64/lib/libkdu_v7AR.so /usr/local/lib/libkdu_v7AR.so && \
     mv /usr/local/cantaloupe/cantaloupe-$CANTALOUPE_VERSION.war /usr/local/tomcat/webapps/cantaloupe.war && \
     unzip /usr/local/tomcat/webapps/cantaloupe.war -d /usr/local/tomcat/webapps/cantaloupe && \
     chown tomcat /usr/local/cantaloupe -R && \

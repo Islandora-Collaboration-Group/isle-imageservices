@@ -41,7 +41,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_ORG }}/isle-imageservices:1.5.6
+            ${{ secrets.DOCKERHUB_ORG }}/isle-imageservices:1.5.7
             ${{ secrets.DOCKERHUB_ORG }}/isle-imageservices:latest
       -
         name: Image digest

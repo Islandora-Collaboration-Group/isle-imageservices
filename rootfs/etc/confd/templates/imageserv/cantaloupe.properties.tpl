@@ -48,6 +48,15 @@ base_uri =
 # percent-encoded version in URLs.
 slash_substitute =
 
+# Parses an identifier's scale constraint suffix.
+# This key only applies to versions >= 4.1.9 and < 5.0.
+scale_constraint_suffix.pattern = -(\d+):(\d+)\b
+
+# Converts a scale constraint suffix to its URL format. {n} and {d} are the
+# numerator and denominator, respectively.
+# This key only applies to versions >= 4.1.9 and < 5.0.
+scale_constraint_suffix.format = -{n}:{d}
+
 # Maximum number of pixels to return in a response, to prevent overloading
 # the server. Requests for more pixels than this will receive an error
 # response. Set to 0 for no maximum.
@@ -95,7 +104,7 @@ endpoint.iiif.min_size = 64
 
 # Minimum size that will be used in info.json `tiles` keys. The user manual
 # explains how these are calculated.
-endpoint.iiif.min_tile_size = 1024
+endpoint.iiif.min_tile_size = 512
 
 # If true, requests for sizes other than those contained in an information
 # response will be denied.
@@ -294,7 +303,8 @@ JdbcSource.connection_timeout = 10
 #   dependencies.
 # * If set to `ManualSelectionStrategy`, a processor will be chosen based
 #   on the rest of the keys in this section.
-processor.selection_strategy = ManualSelectionStrategy
+
+processor.selection_strategy = {{getv "/cantaloupe/processor/selection/strategy" "AutomaticSelectionStrategy"}}
 
 # Built-in processors are `Java2dProcessor`, `GraphicsMagickProcessor`,
 # `ImageMagickProcessor`, `TurboJpegProcessor`, `KakaduNativeProcessor`,
@@ -308,7 +318,7 @@ processor.ManualSelectionStrategy.bmp = ImageMagickProcessor
 processor.ManualSelectionStrategy.dcm = ImageMagickProcessor
 processor.ManualSelectionStrategy.flv = FfmpegProcessor
 processor.ManualSelectionStrategy.gif = ImageMagickProcessor
-processor.ManualSelectionStrategy.jp2 = OpenJpegProcessor
+processor.ManualSelectionStrategy.jp2 = {{getv "/cantaloupe/processor/jp2" "OpenJpegProcessor"}}
 processor.ManualSelectionStrategy.jpg = ImageMagickProcessor
 processor.ManualSelectionStrategy.mov = FfmpegProcessor
 processor.ManualSelectionStrategy.mp4 = FfmpegProcessor
@@ -478,7 +488,7 @@ cache.server.derivative = FilesystemCache
 # for forever.
 # Per https://github.com/Islandora-Collaboration-Group/ISLE/issues/207
 # Changed from default 259200 (30 days) to 86400 (1 day)
-cache.server.source.ttl_seconds = 86400
+cache.server.derivative.ttl_seconds = 86400
 
 # Whether to use the Java heap as a "level 1" cache for image infos, either
 # independently or in front of a "level 2" derivative cache (if enabled).
