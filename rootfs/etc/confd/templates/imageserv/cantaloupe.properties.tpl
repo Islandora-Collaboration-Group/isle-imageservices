@@ -11,7 +11,7 @@
 ###########################################################################
 
 # !! Leave blank to use the JVM default temporary directory.
-temp_pathname =
+temp_pathname = /usr/local/cantaloupe/temp
 
 # !! Configures the HTTP server. (Standalone mode only.)
 http.enabled = false
@@ -303,7 +303,8 @@ JdbcSource.connection_timeout = 10
 #   dependencies.
 # * If set to `ManualSelectionStrategy`, a processor will be chosen based
 #   on the rest of the keys in this section.
-processor.selection_strategy = ManualSelectionStrategy
+# processor.selection_strategy = ManualSelectionStrategy
+processor.selection_strategy = AutomaticSelectionStrategy
 
 # Built-in processors are `Java2dProcessor`, `GraphicsMagickProcessor`,
 # `ImageMagickProcessor`, `TurboJpegProcessor`, `KakaduNativeProcessor`,
