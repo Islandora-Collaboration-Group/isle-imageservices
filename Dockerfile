@@ -16,7 +16,9 @@ ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
     -Dkakadu.home=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
     -Djava.library.path=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/lib:/usr/local/tomcat/lib \
-    -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/lib:/usr/local/tomcat/lib"
+    -DLD_LIBRARY_PATH=/usr/local/cantaloupe/deps/Linux-x86-64/lib:/usr/local/lib:/usr/local/tomcat/lib" \
+    CANTALOUPE_PROCESSOR_SELECTION_STRATEGY=${CANTALOUPE_PROCESSOR_SELECTION_STRATEGY:-ManualSelectionStrategy} \
+    CANTALOUPE_PROCESSOR_JP2=${CANTALOUPE_PROCESSOR_JP2:-OpenJpegProcessor}
 
 
 ## Dependencies 

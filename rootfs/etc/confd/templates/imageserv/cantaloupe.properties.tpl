@@ -303,8 +303,8 @@ JdbcSource.connection_timeout = 10
 #   dependencies.
 # * If set to `ManualSelectionStrategy`, a processor will be chosen based
 #   on the rest of the keys in this section.
-# processor.selection_strategy = ManualSelectionStrategy
-processor.selection_strategy = AutomaticSelectionStrategy
+
+processor.selection_strategy = {{getv "/cantaloupe/processor/selection/strategy" "AutomaticSelectionStrategy"}}
 
 # Built-in processors are `Java2dProcessor`, `GraphicsMagickProcessor`,
 # `ImageMagickProcessor`, `TurboJpegProcessor`, `KakaduNativeProcessor`,
@@ -318,7 +318,7 @@ processor.ManualSelectionStrategy.bmp = ImageMagickProcessor
 processor.ManualSelectionStrategy.dcm = ImageMagickProcessor
 processor.ManualSelectionStrategy.flv = FfmpegProcessor
 processor.ManualSelectionStrategy.gif = ImageMagickProcessor
-processor.ManualSelectionStrategy.jp2 = OpenJpegProcessor
+processor.ManualSelectionStrategy.jp2 = {{getv "/cantaloupe/processor/jp2" "OpenJpegProcessor"}}
 processor.ManualSelectionStrategy.jpg = ImageMagickProcessor
 processor.ManualSelectionStrategy.mov = FfmpegProcessor
 processor.ManualSelectionStrategy.mp4 = FfmpegProcessor
