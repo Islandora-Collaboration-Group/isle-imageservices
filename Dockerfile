@@ -1,4 +1,4 @@
-FROM islandoracollabgroup/isle-tomcat:1.5.7
+FROM islandoracollabgroup/isle-tomcat:1.5.8
 
 # Set up environmental variables for Tomcat, Cantaloupe & dependencies
 # @see: Cantaloupe https://cantaloupe-project.github.io/
@@ -6,7 +6,7 @@ FROM islandoracollabgroup/isle-tomcat:1.5.7
 ENV JAVA_MAX_MEM=${JAVA_MAX_MEM:-2G} \
     JAVA_MIN_MEM=${JAVA_MIN_MEM:-0} \
     CANTALOUPE_VERSION=${CANTALOUPE_VERSION:-4.1.9} \
-    IMAGEMAGICK_VERSION=${IMAGEMAGICK_VERSION:-7.0.11-13} \
+    IMAGEMAGICK_VERSION=${IMAGEMAGICK_VERSION:-7.1.0-2} \
     OPENJPEG_VERSION=${OPENJPEG_VERSION:-v2.4.0} \
     JAVA_OPTS='-Djava.awt.headless=true -server -Xmx${JAVA_MAX_MEM} -Xms${JAVA_MIN_MEM} -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=70 -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true' \
     KAKADU_HOME=/usr/local/cantaloupe/deps/Linux-x86-64/bin \
